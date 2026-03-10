@@ -42,7 +42,7 @@ The TODO markers are intentional — they flag fields where the schema designer 
 
 ## References
 
-1. ATLAS Collaboration, "A simultaneous unbinned differential cross section measurement of twenty-four Z+jets kinematic observables with the ATLAS detector," Phys. Rev. Lett. 133, 261803 (2024), arXiv:2405.20041 [hep-ex]. This is the measurement paper that produced the weight files. The fiducial definition, MC sample descriptions, and uncertainty methodology are documented here. Cut values in the YAML were cross-checked against the data files and are consistent with this paper.
+1. ATLAS Collaboration, "A simultaneous unbinned differential cross section measurement of twenty-four Z+jets kinematic observables with the ATLAS detector," https://arxiv.org/abs/2405.20041. This is the measurement paper that produced the weight files. The fiducial definition, MC sample descriptions, and uncertainty methodology are documented here. Cut values in the YAML were cross-checked against the data files and are consistent with this paper.
 
 2. A. Andreassen, P. T. Komiske, E. M. Metodiev, B. Nachman, J. Thaler, "OmniFold: A Method to Simultaneously Unfold All Observables," Phys. Rev. Lett. 124, 182001 (2020), arXiv:1911.09107 [hep-ph]. The original OmniFold method paper. Provides the algorithmic context for understanding what the per-event weights represent (iterative reweighting to the maximum likelihood particle-level distribution).
 
