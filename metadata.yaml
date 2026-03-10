@@ -1,0 +1,455 @@
+# ============================================================================
+# OmniFold Publication Metadata
+# Accompanies per-event weight files for reinterpretation and archival use.
+# Schema version: 0.1.0
+# ============================================================================
+
+schema_version: "0.1.0"
+
+# --- Dataset Identity -------------------------------------------------------
+dataset:
+  name: "ATLAS Z+jets OmniFold 24D pseudodata"
+  description: >
+    Simultaneous unbinned differential cross-section measurement of 24
+    Z+jets kinematic observables using OmniFold, based on pseudo-data
+    that mimics the ATLAS Run 2 measurement (CERN-EP-2024-132).
+  # Per the Zenodo record, "pseudo-data" means a validation MC sample
+  # with truth- and reco-level quantities that has been reweighted to
+  # match real data. It is NOT real collision data.
+  is_pseudodata: true
+  experiment: "ATLAS"
+  collider: "LHC"
+  sqrt_s_TeV: 13.0
+  integrated_luminosity_fb: 139.0
+  process: "pp -> Z(->mu+mu-) + jets"
+  reference_paper: "arXiv:2405.20041"
+  reference_record: "CERN-EP-2024-132"
+  zenodo_doi: "10.5281/zenodo.11507450"
+  hepdata_record: "ins2791852"  # hepdata.net/record/ins2791852
+
+# --- Fiducial Phase Space ---------------------------------------------------
+# These cuts define the ONLY region in which the published weights are valid.
+# Applying weights to events outside this selection produces incorrect results.
+fiducial_definition:
+  level: "particle"  # truth-level / particle-level definition
+  description: >
+    Boosted Z(->mu mu) + charged-particle jets. The unfolding was
+    performed with pT_ll > 190 GeV to buffer migration effects;
+    published results use pT_ll > 200 GeV.
+
+  leptons:
+    flavor: "muon"
+    n_required: 2
+    charge_requirement: "opposite_sign"
+    # Verified from data: min(pT_l2) = 25.0 GeV, max(|eta|) = 2.4
+    pT_min_GeV: 25.0
+    abs_eta_max: 2.4
+    isolation: "dressed"  # dressed leptons (photons within dR < 0.1 added)
+    dressing_cone_dR: 0.1
+
+  dilepton_system:
+    # verified from data: m_ll ranges from 81.0 to 101.0 GeV (mZ ± 10 GeV)
+    mass_window_GeV: [81.0, 101.0]
+    pT_min_GeV: 200.0  # reported fiducial cut
+    # internal unfolding boundary was 190 GeV to handle migrations.
+    unfolding_boundary_pT_GeV: 190.0
+
+  jets:
+    algorithm: "anti-kt"
+    radius: 0.4
+    input_particles: "charged"  #track jets
+    charged_particle_pT_min_GeV: 0.5
+    charged_particle_abs_eta_max: 2.5
+    lepton_removal: true  # prompt leptons excluded from jet clustering
+    n_required: 2  # two leading jets used
+    
+    # TODO: confirm jet pT and rapidity cuts. The paper does not impose
+    # a hard jet pT floor since the measurement is inclusive in jet pT.
+    # pT_min_GeV: null  (uncomment if confirmed)
+    # abs_y_max: null
+
+  # TODO: Add any overlap-removal criteria if documented.
+
+# --- Observable Definitions -------------------------------------------------
+observables:
+  # Dilepton system
+  - column: "pT_ll"
+    physics_name: "p_T^{ll}"
+    description: "Transverse momentum of the dimuon system"
+    unit: "GeV"
+  - column: "y_ll"
+    physics_name: "y^{ll}"
+    description: "Rapidity of the dimuon system"
+    unit: null  # dimensionless
+
+  # Leading lepton (pT-ordered)
+  - column: "pT_l1"
+    physics_name: "p_T^{l1}"
+    description: "Transverse momentum of the leading muon"
+    unit: "GeV"
+  - column: "pT_l2"
+    physics_name: "p_T^{l2}"
+    description: "Transverse momentum of the subleading muon"
+    unit: "GeV"
+  - column: "eta_l1"
+    physics_name: "eta^{l1}"
+    description: "Pseudorapidity of the leading muon"
+    unit: null
+  - column: "eta_l2"
+    physics_name: "eta^{l2}"
+    description: "Pseudorapidity of the subleading muon"
+    unit: null
+  - column: "phi_l1"
+    physics_name: "phi^{l1}"
+    description: "Azimuthal angle of the leading muon"
+    unit: "rad"
+  - column: "phi_l2"
+    physics_name: "phi^{l2}"
+    description: "Azimuthal angle of the subleading muon"
+    unit: "rad"
+
+  # Leading track jet
+  - column: "pT_trackj1"
+    physics_name: "p_T^{j1}"
+    description: "Transverse momentum of the leading charged-particle jet"
+    unit: "GeV"
+  - column: "y_trackj1"
+    physics_name: "y^{j1}"
+    description: "Rapidity of the leading charged-particle jet"
+    unit: null
+  - column: "phi_trackj1"
+    physics_name: "phi^{j1}"
+    description: "Azimuthal angle of the leading charged-particle jet"
+    unit: "rad"
+  - column: "m_trackj1"
+    physics_name: "m^{j1}"
+    description: "Mass of the leading charged-particle jet"
+    unit: "GeV"
+  - column: "tau1_trackj1"
+    physics_name: "tau_1^{j1}"
+    description: "1-subjettiness of the leading jet (beta=1)"
+    unit: null
+  - column: "tau2_trackj1"
+    physics_name: "tau_2^{j1}"
+    description: "2-subjettiness of the leading jet (beta=1)"
+    unit: null
+  - column: "tau3_trackj1"
+    physics_name: "tau_3^{j1}"
+    description: "3-subjettiness of the leading jet (beta=1)"
+    unit: null
+  - column: "Ntracks_trackj1"
+    physics_name: "N_{trk}^{j1}"
+    description: "Number of charged constituents in the leading jet"
+    unit: null
+    dtype: "integer"
+
+  # Subleading track jet (same structure as above)
+  - column: "pT_trackj2"
+    physics_name: "p_T^{j2}"
+    description: "Transverse momentum of the subleading charged-particle jet"
+    unit: "GeV"
+  - column: "y_trackj2"
+    physics_name: "y^{j2}"
+    description: "Rapidity of the subleading charged-particle jet"
+    unit: null
+  - column: "phi_trackj2"
+    physics_name: "phi^{j2}"
+    description: "Azimuthal angle of the subleading charged-particle jet"
+    unit: "rad"
+  - column: "m_trackj2"
+    physics_name: "m^{j2}"
+    description: "Mass of the subleading charged-particle jet"
+    unit: "GeV"
+  - column: "tau1_trackj2"
+    physics_name: "tau_1^{j2}"
+    description: "1-subjettiness of the subleading jet (beta=1)"
+    unit: null
+  - column: "tau2_trackj2"
+    physics_name: "tau_2^{j2}"
+    description: "2-subjettiness of the subleading jet (beta=1)"
+    unit: null
+  - column: "tau3_trackj2"
+    physics_name: "tau_3^{j2}"
+    description: "3-subjettiness of the subleading jet (beta=1)"
+    unit: null
+  - column: "Ntracks_trackj2"
+    physics_name: "N_{trk}^{j2}"
+    description: "Number of charged constituents in the subleading jet"
+    unit: null
+    dtype: "integer"
+
+# --- Weight Definitions -----------------------------------------------------
+# Central principle: every weight column must state what it IS, what
+# normalization convention it uses, and how a consumer should USE it.
+weights:
+  normalization_convention: >
+    Weights represent absolute fiducial cross sections in femtobarns (fb).
+    Verified: sum(weights_nominal) = 1809.5 fb, consistent with the
+    published total fiducial cross section of 1808 +/- 42 fb. To obtain
+    a differential cross section dsigma/dX, histogram observable X using
+    weights_nominal as bin weights; the resulting bin contents are in fb.
+
+  columns:
+    # --- Prior weight -------------------------------------------------------
+    - column: "weight_mc"
+      category: "prior"
+      description: >
+        Raw Monte Carlo generator weight before any unfolding correction.
+        Reflects the MC prior used as the starting point for OmniFold.
+      present_in: ["multifold.h5", "multifold_sherpa.h5", "multifold_nonDY.h5"]
+
+    # --- Nominal unfolded weight --------------------------------------------
+    - column: "weights_nominal"
+      category: "nominal"
+      description: >
+        Main OmniFold output. The per-event weight that corrects for
+        detector effects. To compute a differential cross section in
+        observable X, histogram X using these weights.
+      present_in: ["multifold.h5", "multifold_sherpa.h5", "multifold_nonDY.h5"]
+
+    # --- Ensemble (NN initialization uncertainty) ---------------------------
+    - column: "weights_ensemble_{i}"
+      category: "statistical_uncertainty"
+      index_range: [0, 99]
+      count: 100
+      description: >
+        Ensemble of 100 independently trained OmniFold models, each
+        with different random NN initialization seeds. The spread
+        across the ensemble quantifies the uncertainty from the
+        stochastic training procedure. To obtain an uncertainty band,
+        compute the observable histogram for each ensemble member
+        and take the standard deviation across the 100 histograms.
+      present_in: ["multifold.h5"]
+
+    # --- MC bootstrap -------------------------------------------------------
+    - column: "weights_bootstrap_mc_{i}"
+      category: "statistical_uncertainty"
+      index_range: [0, 24]
+      count: 25
+      description: >
+        Poisson-bootstrap replicas of the MC sample. Each replica
+        resamples the simulation events with Poisson weights before
+        unfolding. The spread quantifies the statistical uncertainty
+        from the finite MC sample size.
+      present_in: ["multifold.h5", "multifold_sherpa.h5"]
+
+    # --- Data bootstrap -----------------------------------------------------
+    - column: "weights_bootstrap_data_{i}"
+      category: "statistical_uncertainty"
+      index_range: [0, 24]
+      count: 25
+      description: >
+        Poisson-bootstrap replicas of the data sample. Each replica
+        resamples the data events before unfolding. The spread
+        quantifies the statistical uncertainty from the finite data
+        sample size.
+      present_in: ["multifold.h5"]
+
+    # --- Data-driven reweighting pair ---------------------------------------
+    - column: "weights_dd"
+      category: "data_driven"
+      description: >
+        TODO: Clarify what this weight represents. Likely the
+        data-driven correction weight. Document relationship with
+        target_dd.
+      present_in: ["multifold.h5"]
+    - column: "target_dd"
+      category: "data_driven"
+      description: >
+        TODO: Clarify. Likely the target distribution for the
+        data-driven reweighting. Not a weight to be applied directly.
+      present_in: ["multifold.h5"]
+
+    # --- Experimental systematic weights ------------------------------------
+    # Each column below is the result of re-running OmniFold with the
+    # corresponding systematic variation applied. The shift relative
+    # to weights_nominal gives the systematic uncertainty.
+    - column: "weights_pileup"
+      category: "experimental_systematic"
+      group: "pileup"
+      description: "Pileup modeling variation"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_muEffReco"
+      category: "experimental_systematic"
+      group: "muon_efficiency"
+      description: "Muon reconstruction efficiency variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_muEffIso"
+      category: "experimental_systematic"
+      group: "muon_efficiency"
+      description: "Muon isolation efficiency variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_muEffTrack"
+      category: "experimental_systematic"
+      group: "muon_efficiency"
+      description: "Muon tracking efficiency variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_muEffTrig"
+      category: "experimental_systematic"
+      group: "muon_efficiency"
+      description: "Muon trigger efficiency variation"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_muCalID"
+      category: "experimental_systematic"
+      group: "muon_calibration"
+      description: "Muon inner-detector momentum calibration"
+      present_in: ["multifold.h5"]
+    - column: "weights_muCalMS"
+      category: "experimental_systematic"
+      group: "muon_calibration"
+      description: "Muon spectrometer momentum calibration"
+      present_in: ["multifold.h5"]
+    - column: "weights_muCalResBias"
+      category: "experimental_systematic"
+      group: "muon_calibration"
+      description: "Muon momentum resolution bias"
+      present_in: ["multifold.h5"]
+    - column: "weights_muCalScale"
+      category: "experimental_systematic"
+      group: "muon_calibration"
+      description: "Muon momentum scale"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_trackEffMain"
+      category: "experimental_systematic"
+      group: "tracking"
+      description: "Main track reconstruction efficiency variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_trackEffJet"
+      category: "experimental_systematic"
+      group: "tracking"
+      description: "In-jet track reconstruction efficiency variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_trackFake"
+      category: "experimental_systematic"
+      group: "tracking"
+      description: "Fake track rate variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_trackPtScale"
+      category: "experimental_systematic"
+      group: "tracking"
+      description: "Track pT scale variation"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_theoryPSjet"
+      category: "theory_systematic"
+      group: "parton_shower"
+      description: "Parton shower jet modeling variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_theoryPSsoft"
+      category: "theory_systematic"
+      group: "parton_shower"
+      description: "Parton shower soft radiation variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_theoryMPI"
+      category: "theory_systematic"
+      group: "parton_shower"
+      description: "Multiple parton interaction modeling variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_theoryPSscale"
+      category: "theory_systematic"
+      group: "parton_shower"
+      description: "Parton shower scale variation"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_theoryAlphaS"
+      category: "theory_systematic"
+      group: "theory_parameters"
+      description: "Strong coupling constant (alpha_s) variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_theoryQCD"
+      category: "theory_systematic"
+      group: "theory_parameters"
+      description: "QCD scale variation"
+      present_in: ["multifold.h5"]
+    - column: "weights_theoryPDF"
+      category: "theory_systematic"
+      group: "theory_parameters"
+      description: "Parton distribution function variation"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_topBackground"
+      category: "theory_systematic"
+      group: "background"
+      description: "Top-quark background normalization variation"
+      present_in: ["multifold.h5"]
+
+    - column: "weights_lumi"
+      category: "experimental_systematic"
+      group: "luminosity"
+      description: "Integrated luminosity uncertainty"
+      present_in: ["multifold.h5"]
+
+# --- File Manifest ----------------------------------------------------------
+files:
+  - filename: "multifold.h5"
+    role: "nominal"
+    generator: "MadGraph5_aMC@NLO"
+    # TODO: specify MG5 version and parton shower (Pythia8?)
+    parton_shower: null
+    tune: null
+    n_events: 418014
+    n_columns: 200
+    description: >
+      Nominal unfolding result. Contains all statistical and systematic
+      weight variations.
+
+  - filename: "multifold_sherpa.h5"
+    role: "generator_systematic"
+    generator: "Sherpa"
+    # TODO: specify Sherpa version
+    parton_shower: "Sherpa internal"
+    tune: null
+    n_events: 326430
+    n_columns: 51
+    description: >
+      Alternative generator. Used to assess the generator modeling
+      systematic uncertainty by comparing the unfolded result when
+      Sherpa is used as the MC prior instead of MadGraph5.
+
+  - filename: "multifold_nonDY.h5"
+    role: "sample_composition_systematic"
+    generator: "MadGraph5_aMC@NLO"
+    parton_shower: null
+    tune: null
+    n_events: 433397
+    n_columns: 26
+    description: >
+      Alternative sample composition including electroweak Zjj/VBF
+      and diboson contributions. Used to assess the systematic
+      uncertainty from the signal/background composition assumed
+      during unfolding. Note: no bootstrap or systematic weights
+      are provided for this file.
+    # TODO: Clarify why this file has MORE events than the nominal.
+    # Is it the same MC with additional background processes added?
+
+# --- OmniFold Training Provenance -------------------------------------------
+unfolding:
+  method: "OmniFold"
+  omnifold_version: null  # TODO: specify package version used
+  n_iterations: 6  # TODO: confirm (paper uses 6 for the ATLAS measurement)
+  # TODO: fill in the following from the analysis documentation
+  classifier_architecture: null  # e.g. "dense NN, 3 layers x 128 nodes"
+  input_features_step1: null    # detector-level features fed to step-1 classifier
+  input_features_step2: null    # particle-level features fed to step-2 classifier
+  training_fraction: 0.8        # fraction of events used for training vs validation
+  convergence_criterion: null   # e.g. "validation loss plateau"
+  ensemble_strategy: >
+    TODO: Describe how the 100 ensemble members differ (random seed
+    for NN initialization? different train/val split? both?).
+
+# --- Format Specification ---------------------------------------------------
+file_format:
+  container: "HDF5"
+  internal_layout: "PyTables/pandas DataFrame"
+  reading_instructions: >
+    Use pandas.read_hdf(filename, key='df') to load each file as a
+    DataFrame. Columns are accessible as df['column_name']. Note that
+    this format is Python/pandas-specific; C++ or Julia users will
+    need to navigate the PyTables HDF5 group structure manually
+    (groups: df/axis0, df/axis1, df/block0_values, etc.).
+  known_limitations:
+    - "Files exceed HEPData 100 MB limit; hosted on Zenodo instead"
+    - "PyTables layout is not portable across HDF5 readers"
